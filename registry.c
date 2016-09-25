@@ -185,7 +185,7 @@ PHP_FUNCTION(reg_enum_key)
 
 /* {{{ proto mixed reg_enum_value(mixed hKey[, int index=-1])
    */
-PHP_FUNCTION(reg_enum_value TSRMLS_DC)
+PHP_FUNCTION(reg_enum_value)
 {
 	zval *zhKey;
 	long long index = - 1;
