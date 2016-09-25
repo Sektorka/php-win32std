@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // $Id: $
 // vim:ft=javascript 
 
@@ -56,4 +57,64 @@ if(PHP_WIN32STD != "no"){
   else {
     ERROR( "win32std libs not found" );
   }
+=======
+// $Id: $
+// vim:ft=javascript 
+
+ARG_ENABLE("win32std", "win32std support", "no");
+
+if(PHP_WIN32STD != "no"){
+  	if (
+      CHECK_LIB("winmm.lib", "win32std") &&
+      CHECK_LIB("odbc32.lib", "win32std") &&
+      CHECK_LIB("odbccp32.lib", "win32std") &&
+      CHECK_LIB("kernel32.lib", "win32std") &&
+      CHECK_LIB("user32.lib", "win32std") &&
+      CHECK_LIB("gdi32.lib", "win32std") &&
+      CHECK_LIB("winspool.lib", "win32std") &&
+      CHECK_LIB("comdlg32.lib", "win32std") &&
+	  CHECK_LIB("advapi32.lib", "win32std") &&
+      CHECK_LIB("shell32.lib", "win32std") &&
+      CHECK_LIB("ole32.lib", "win32std") &&
+      CHECK_LIB("oleaut32.lib", "win32std") &&
+      CHECK_LIB("uuid.lib", "win32std")
+    ) {
+
+    ADD_FLAG("CFLAGS_WIN32STD", "/Zc:wchar_t ");
+	ADD_FLAG("CFLAGS_WIN32STD", "/nologo ");
+	ADD_FLAG("CFLAGS_WIN32STD", "/GS ");
+    ADD_FLAG("CFLAGS_WIN32STD", "/MD ");
+    ADD_FLAG("CFLAGS_WIN32STD", "/W3 ");
+    ADD_FLAG("CFLAGS_WIN32STD", "/EHsc ");
+    ADD_FLAG("CFLAGS_WIN32STD", "/O2 ");
+    ADD_FLAG("CFLAGS_WIN32STD", "/FD ");
+	ADD_FLAG("CFLAGS_WIN32STD", "/GF ");
+	ADD_FLAG("CFLAGS_WIN32STD", "/Gy ");
+	ADD_FLAG("CFLAGS_WIN32STD", "/Zi ");
+	ADD_FLAG("CFLAGS_WIN32STD", "/Gm- ");
+    ADD_FLAG("CFLAGS_WIN32STD", "/c ");
+	
+    
+    ADD_FLAG("CFLAGS_WIN32STD", "/DNDEBUG ");
+    ADD_FLAG("CFLAGS_WIN32STD", "/DZEND_DEBUG=0 ");
+    ADD_FLAG("CFLAGS_WIN32STD", "/DWIN32 ");
+    ADD_FLAG("CFLAGS_WIN32STD", "/D_WINDOWS ");
+    ADD_FLAG("CFLAGS_WIN32STD", "/D_MBCS ");
+    ADD_FLAG("CFLAGS_WIN32STD", "/D_USRDLL ");
+    ADD_FLAG("CFLAGS_WIN32STD", "/DHAVE_WIN32STD=1 ");
+    ADD_FLAG("CFLAGS_WIN32STD", "/DPHP_WIN32 ");
+	ADD_FLAG("CFLAGS_WIN32STD", "/DZEND_WIN32 ");
+	ADD_FLAG("CFLAGS_WIN32STD", "/DCOMPILE_DL_WIN32STD ");
+	ADD_FLAG("CFLAGS_WIN32STD", "/D_VC80_UPGRADE=0x0600 ");
+	ADD_FLAG("CFLAGS_WIN32STD", "/D_WINDLL ");
+    
+    EXTENSION("win32std", "win32std.c", true);
+		
+		//Add extra sources
+		ADD_SOURCES(configure_module_dirname, "cpp_functions.cpp registry.c res.c res_stream.c", "win32std");
+  }
+  else {
+    ERROR( "win32std libs not found" );
+  }
+>>>>>>> origin/master
 }
