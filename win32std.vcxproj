@@ -163,7 +163,7 @@
       <OutputFile>Release/php_win32std.dll</OutputFile>
       <ImportLibrary>.\Release\php_win32std.lib</ImportLibrary>
       <AdditionalDependencies>php7ts.lib;winmm.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>d:\Sektor\Develop\Cpp\php-sdk\phpdev\vc14\x64\php-7.0.1\x64\Release_TS\php-7.0.1-devel-VC14-x64\lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>d:\Sektor\Develop\Cpp\php-sdk\phpdev\vc14\x64\php-7.1.0alpha3-src\x64\Release_TS\php-7.1.0alpha3-devel-VC14-x64\lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

@@ -50,7 +50,7 @@ PHP_FUNCTION(res_open)
     char buffer[WIN32_STRERROR_BUFFER_LEN];
     //res_resource * res_rc;
 
-	if( zend_parse_parameters( ZEND_NUM_ARGS() TSRMLS_CC, "s", &module, &module_len ) == FAILURE ) 
+	if( zend_parse_parameters( ZEND_NUM_ARGS() TSRMLS_CC, "s", &module, &module_len ) == FAILURE )
 		RETURN_LONG(-1);
 
 	// if module=="" module is the current executable
@@ -58,13 +58,13 @@ PHP_FUNCTION(res_open)
         h_module= NULL;
     else {
 	    h_module= LoadLibrary(module);
-	    if( !h_module ) { 
-		    zend_error(E_WARNING, "res_open '%s' failed: %s", module, win32_strerror(buffer, WIN32_STRERROR_BUFFER_LEN)); 
+	    if( !h_module ) {
+		    zend_error(E_WARNING, "res_open '%s' failed: %s", module, win32_strerror(buffer, WIN32_STRERROR_BUFFER_LEN));
 		    RETURN_FALSE
 	    }
     }
 
-    zend_fetch_resource(return_value, h_module, le_res_resource );
+    ZVAL_RES(return_value, zend_register_resource(h_module, le_res_resource));
 }
 /* }}} */
 
@@ -77,12 +77,12 @@ PHP_FUNCTION(res_close)
 	zval *res_rc;
     HMODULE h;
 
-	if( zend_parse_parameters( ZEND_NUM_ARGS() TSRMLS_CC, "r", &res_rc ) == FAILURE ) 
+	if( zend_parse_parameters( ZEND_NUM_ARGS() TSRMLS_CC, "r", &res_rc ) == FAILURE )
 		RETURN_FALSE
-    
-    if((h = (HMODULE) zend_fetch_resource(&res_rc, le_res_resource_name, le_res_resource)) == NULL)
+
+    if((h = (HMODULE) zend_fetch_resource(Z_RES_P(res_rc), le_res_resource_name, le_res_resource)) == NULL)
         RETURN_FALSE
-    
+
 
     zend_list_delete(Z_RES_VAL_P(res_rc));
 
@@ -92,7 +92,7 @@ PHP_FUNCTION(res_close)
 
 
 /* {{{ proto res_get( resource module, string type, string name[, int lang] )
-	Get a resource. 
+	Get a resource.
 	lang is experimental: 0 is neutral, 1 is user default, 2 is system default (see winnt.h LANG_* & SUBLANG_*).
 */
 PHP_FUNCTION(res_get)
@@ -107,17 +107,17 @@ PHP_FUNCTION(res_get)
     char buffer[WIN32_STRERROR_BUFFER_LEN];
     zval *res_rc;
 
-	if( zend_parse_parameters( ZEND_NUM_ARGS() TSRMLS_CC, "rss|l", &res_rc, &type, &type_len, &name, &name_len, &lang ) == FAILURE ) 
+	if( zend_parse_parameters( ZEND_NUM_ARGS() TSRMLS_CC, "rss|l", &res_rc, &type, &type_len, &name, &name_len, &lang ) == FAILURE )
 		RETURN_NULL();
 
     if( !name_len || !type_len ) {
-        zend_error(E_WARNING, "res_get: name or type can't be empty"); 
+        zend_error(E_WARNING, "res_get: name or type can't be empty");
         RETURN_NULL();
     }
 
-	if((h_module = (HMODULE)zend_fetch_resource(&res_rc, le_res_resource_name, le_res_resource)) == NULL)
+	if((h_module = (HMODULE)zend_fetch_resource(Z_RES_P(res_rc), le_res_resource_name, le_res_resource)) == NULL)
 		RETURN_FALSE
-    
+
 
     // Convert name and type to uppercase since lowercase don't work
     strupr(name);
@@ -128,13 +128,13 @@ PHP_FUNCTION(res_get)
     else
         hr= FindResource( h_module, name, type );
 	if( hr==NULL ) {
-        zend_error(E_WARNING, "res_get: find '%s/%s' failed: %s", type, name, win32_strerror(buffer, WIN32_STRERROR_BUFFER_LEN)); 
+        zend_error(E_WARNING, "res_get: find '%s/%s' failed: %s", type, name, win32_strerror(buffer, WIN32_STRERROR_BUFFER_LEN));
 		RETURN_NULL( );
 	}
 
 	rc= LoadResource( h_module, hr );
 	if( rc==NULL ) {
-        zend_error(E_WARNING, "res_get: load '%s/%s' failed: %s", type, name, win32_strerror(buffer, WIN32_STRERROR_BUFFER_LEN)); 
+        zend_error(E_WARNING, "res_get: load '%s/%s' failed: %s", type, name, win32_strerror(buffer, WIN32_STRERROR_BUFFER_LEN));
 		RETURN_NULL( );
 	}
 
@@ -158,11 +158,11 @@ PHP_FUNCTION(res_set)
     long lang= MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL);
 
 
-	if( zend_parse_parameters( ZEND_NUM_ARGS() TSRMLS_CC, "ssss|l", 
-		&module, &module_len, 
-		&type, &type_len, 
+	if( zend_parse_parameters( ZEND_NUM_ARGS() TSRMLS_CC, "ssss|l",
+		&module, &module_len,
+		&type, &type_len,
 		&name, &name_len,
-		&data, &data_len, &lang ) == FAILURE ) 
+		&data, &data_len, &lang ) == FAILURE )
 		RETURN_FALSE;
 
 	//zend_error( E_WARNING, "res_set modifie res://%s/%s/%s avec %d octets",
@@ -178,9 +178,9 @@ PHP_FUNCTION(res_set)
     strupr(type);
 
     h_module= BeginUpdateResource( module, FALSE );
-	if( h_module==NULL ) { 
+	if( h_module==NULL ) {
         zend_error(E_WARNING, "res_set: error opening module: %s", win32_strerror(buffer, WIN32_STRERROR_BUFFER_LEN) );
-		RETURN_FALSE; 
+		RETURN_FALSE;
 	}
 
 	if( UpdateResource( h_module, type, name, (WORD)lang, data, data_len )==0 ) {
@@ -223,7 +223,7 @@ long php_res_list_get_int_type( const char * string_type )
 }
 
 
-BOOL CALLBACK php_res_list_callback( 
+BOOL CALLBACK php_res_list_callback(
   HMODULE h_module,  // module handle
   LPCTSTR lpszType,  // pointer to resource type
   LPTSTR lpszName,   // pointer to resource name
@@ -255,10 +255,10 @@ PHP_FUNCTION(res_list)
     char buffer[WIN32_STRERROR_BUFFER_LEN];
     zval * res_rc;
 
-	if( zend_parse_parameters( ZEND_NUM_ARGS() TSRMLS_CC, "rs", &res_rc, &type, &type_len ) == FAILURE ) 
+	if( zend_parse_parameters( ZEND_NUM_ARGS() TSRMLS_CC, "rs", &res_rc, &type, &type_len ) == FAILURE )
 		RETURN_FALSE;
 
-	if(( h_module = (HMODULE)zend_fetch_resource(&res_rc, le_res_resource_name, le_res_resource)) == NULL)
+	if(( h_module = (HMODULE)zend_fetch_resource(Z_RES_P(res_rc), le_res_resource_name, le_res_resource)) == NULL)
 		RETURN_FALSE
 
 	if( !type || !type[0] ) RETURN_FALSE;
@@ -368,11 +368,11 @@ PHP_FUNCTION(res_list_type)
     char buffer[WIN32_STRERROR_BUFFER_LEN];
     zval *res_rc;
 
-	if( zend_parse_parameters( ZEND_NUM_ARGS() TSRMLS_CC, "r|b", &res_rc, &as_string ) == FAILURE ) 
+	if( zend_parse_parameters( ZEND_NUM_ARGS() TSRMLS_CC, "r|b", &res_rc, &as_string ) == FAILURE )
 		RETURN_FALSE;
-    if((h_module = (HMODULE) zend_fetch_resource(&res_rc, le_res_resource_name, le_res_resource)) == NULL)
+    if((h_module = (HMODULE) zend_fetch_resource(Z_RES_P(res_rc), le_res_resource_name, le_res_resource)) == NULL)
     	RETURN_FALSE
-    
+
 
 	if( !array_init( return_value ) ) {
 		if( !as_string )
